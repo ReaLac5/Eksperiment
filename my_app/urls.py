@@ -7,4 +7,6 @@ urlpatterns = [
     path('show/', views.get_all_person),
     path('random-names/', views.get_random_names, name='random_names'),
     path('people_by_company/', views.get_people_by_company, name='people_by_company'),
+    path('select-company/', views.select_company, name='select_company'),
+    path('select-company-2/', views.select_company_2, name='select_company_2'),
 ]
