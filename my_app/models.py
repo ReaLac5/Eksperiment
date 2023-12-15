@@ -1,3 +1,4 @@
-from django.db import models
+from db_connection import db
+import json
 
-# Create your models here.
+person_collection = db['Person']
