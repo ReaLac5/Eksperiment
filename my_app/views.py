@@ -194,3 +194,91 @@ def select_company_2(request):
         return get_people_by_company_2(request, selected_company)
 
     return render(request, 'select_company_2.html', {'company_dict': company_dict})
+
+
+
+from django.shortcuts import render
+from pymongo import MongoClient
+from bson import ObjectId  # Import ObjectId
+
+def update_companies(request):
+    if request.method == 'POST':
+        # Handling form submission
+        person_id = request.POST.get('person_id')
+        companies = request.POST.get('companies').split(',') if request.POST.get('companies') else []
+
+        client = MongoClient('mongodb://mongo:27017/')
+        db = client['eksperiment']
+        people_collection = db['Person']
+
+        if person_id:
+            try:
+                #updated_companies = companies.split(', ')  # Assuming companies are comma-separated
+                people_collection.update_one(
+                    {'_id': ObjectId(person_id)},
+                    {'$set': {'companies': companies}}
+                )
+                return HttpResponse('Companies updated successfully!')
+            except Exception as e:
+                return HttpResponseServerError(f'Error: {str(e)}')
+        else:
+            return HttpResponseServerError('Please provide a valid person ID!')
+    else:
+        # Fetching data for the dropdown
+        try:
+            client = MongoClient('mongodb://mongo:27017/')
+            db = client['eksperiment']
+            person_collection = db['Person']
+
+            people_list = list(person_collection.find({}, {'_id': 1, 'companies': 1}))
+            print(people_list)
+            people_dropdown = [{'id': str(person['_id']), 'companies': person.get('companies', [])} for person in people_list]
+            
+            return render(request, 'update_companies.html', {'people_list': people_dropdown})
+        except Exception as e:
+            return HttpResponseServerError(f'Error: {str(e)}')
+
+
+def update_companies_2(request):
+    if request.method == 'POST':
+        # Handling form submission
+        person_id = request.POST.get('person_id')
+        new_company_name = request.POST.get('companies')
+
+        client = MongoClient('mongodb://mongo:27017/')
+        db = client['eksperiment']
+        people_collection = db['Person']
+        company_collection = db['Company']
+
+        if person_id and new_company_name:
+            try:
+                # Find the person
+                person = people_collection.find_one({'_id': ObjectId(person_id)})
+                if person:
+                    # Update company name in the company collection
+                    company_ids = person.get('companies', [])
+                    for company_id in company_ids:
+                        company_collection.update_one(
+                            {'_id': company_id},
+                            {'$set': {'name': new_company_name}}
+                        )
+                    return HttpResponse('Company name updated successfully!')
+                else:
+                    return HttpResponseServerError('Person not found!')
+            except Exception as e:
+                return HttpResponseServerError(f'Error: {str(e)}')
+        else:
+            return HttpResponseServerError('Please provide a valid person ID and new company name!')
+    else:
+        # Fetching data for the dropdown
+        try:
+            client = MongoClient('mongodb://mongo:27017/')
+            db = client['eksperiment']
+            person_collection = db['Person']
+
+            people_list = list(person_collection.find({}, {'_id': 1, 'companies': 1}))
+            people_dropdown = [{'id': str(person['_id'])} for person in people_list]
+            
+            return render(request, 'update_companies_2.html', {'people_list': people_dropdown})
+        except Exception as e:
+            return HttpResponseServerError(f'Error: {str(e)}')
