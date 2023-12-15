@@ -2,7 +2,7 @@ import pymongo
 import csv
 import pandas as pd
 
-url = 'mongodb://localhost:27017/'
+url = 'mongodb://mongo:27017/'
 client = pymongo.MongoClient(url)
 db = client['eksperiment']
 collection = db['Person']

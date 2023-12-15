@@ -9,7 +9,6 @@ collection = db['Person']
 collection_person_2 = db['Person-2']
 collection_company = db['Company']
 
-
 with open('output_data_Person.csv', 'r') as file:
     reader = csv.DictReader(file)
 
