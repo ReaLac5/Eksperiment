@@ -10,21 +10,14 @@ services:
     volumes:
       - .:/app
     environment:
+      - ALLOWED_HOSTS=django
       - MONGO_URI=mongodb://mongo:27017/eksperiment
     depends_on:
       - mongo
     command: python3 manage.py runserver 0.0.0.0:8000
+    #entrypoint: /usr/local/bin/entrypoint.sh
 
   mongo:
     image: mongo:latest
     ports:
       - "27017:27017"
-
-  benchmark:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    volumes:
-      - .:/app
-    depends_on:
-      - django
