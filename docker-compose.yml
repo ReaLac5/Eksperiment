@@ -19,3 +19,12 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
+
+  benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    depends_on:
+      - django

@@ -20,11 +20,19 @@ def generate_company_dict(count):
             unique_companies[company_name] = fake.address()
     return unique_companies
 
-
 min_companies = 2
 max_companies = 5
 
 company_dict = generate_company_dict(3000)
+
+
+for company_name, address in company_dict.items():
+    company_data = {
+        'name': company_name,
+        'address': address
+    }
+    inserted_company = collection_company.insert_one(company_data)
+
 
 with open('MOCK_DATA.csv', 'r') as file:
     reader = csv.DictReader(file)
@@ -37,13 +45,11 @@ with open('MOCK_DATA.csv', 'r') as file:
             company_name = random.choice(list(company_dict.keys()))
             if company_name not in company_names:
                 company_names.add(company_name)
-                company_data = {
-                        'name': company_name,
-                        'address': company_dict[company_name]
-                    }
-                inserted_company = collection_company.insert_one(company_data)
-                inserted_company_id = inserted_company.inserted_id
-                company_ids[company_name] = inserted_company_id
+        
+        for company_name in company_names:
+            company_data = collection_company.find_one({'name': company_name})
+            if company_data:
+                company_ids[company_name] = company_data['_id']
 
         data = {
             'first_name': row['first_name'],

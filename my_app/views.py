@@ -282,3 +282,67 @@ def update_companies_2(request):
             return render(request, 'update_companies_2.html', {'people_list': people_dropdown})
         except Exception as e:
             return HttpResponseServerError(f'Error: {str(e)}')
+
+
+
+
+
+from django.http import JsonResponse
+from pymongo import MongoClient
+
+def list_people_in_company(request):
+    # Connecting to the database
+    client = MongoClient('mongodb://mongo:27017/')
+    db = client['eksperiment']
+    person_collection = db['Person']
+
+    company_dict = {}
+    with open('company_data.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            company_dict[row['Company']] = row['Address']
+
+    # Company name for which you want to retrieve employees
+    company_name = random.choice(list(company_dict.keys()))
+
+    # Retrieving people working in the selected company
+    people_in_company = person_collection.find({'companies': company_name})
+    print(people_in_company)
+    if people_in_company != '':
+        people_names = [{'first_name': person['first_name'], 'last_name': person['last_name']} for person in people_in_company]
+        return JsonResponse({'people_in_company': people_names})
+    else:
+        return JsonResponse({'error': 'No people with that company name'})
+
+
+def list_people_in_company_2(request):
+    # Connecting to the database
+    client = MongoClient('mongodb://mongo:27017/')
+    db = client['eksperiment']
+    person_collection = db['Person-2']
+    company_collection = db['Company']
+
+    company_dict = {}
+    with open('company_data.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            company_dict[row['Company']] = row['Address']
+
+    # Company name for which you want to retrieve employees
+    company_name = random.choice(list(company_dict.keys()))
+
+    # Get the ObjectId of the selected company from the Company collection
+    company = company_collection.find_one({'name': company_name})
+    if company:
+        company_id = company['_id']
+
+        # Retrieving people working in the selected company by searching for company_id in the 'companies' list
+        people_in_company = person_collection.find({'companies': company_id})
+
+        # Creating a list with the names of people
+        people_names = [{'first_name': person['first_name'], 'last_name': person['last_name']} for person in people_in_company]
+
+        # Returning the result as a JSON response
+        return JsonResponse({'people_in_company': people_names})
+    else:
+        return JsonResponse({'error': 'No people with that company name'})

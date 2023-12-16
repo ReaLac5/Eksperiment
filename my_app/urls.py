@@ -11,4 +11,6 @@ urlpatterns = [
     path('select-company-2/', views.select_company_2, name='select_company_2'),
     path('update-companies/', views.update_companies, name='update_companies'),
     path('update-companies-2/', views.update_companies_2, name='update_companies_2'),
+    path('list_people_in_company/', views.list_people_in_company, name='list_people_in_company'),
+    path('list_people_in_company_2/', views.list_people_in_company_2, name='list_people_in_company_2'),
 ]
