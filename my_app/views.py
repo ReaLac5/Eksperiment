@@ -526,3 +526,57 @@ def add_company_to_person_2(request):
     else:
         return JsonResponse({"message": "Person not found"})
 
+
+
+
+def update_companies_new_2(request):
+    fake = Faker()
+
+    company_names = []
+    with open('companies.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            company_names.append(row['Company'])
+
+    old_company_name = random.choice(company_names)
+
+    while True:
+        new_company_name = fake.company()
+        if new_company_name not in company_names:
+            break
+
+    client = MongoClient('mongodb://mongo:27017/')
+    db = client['eksperiment']
+    company_collection = db['Company']
+
+    company_collection.update_many({'name': old_company_name}, {'$set': {'name': new_company_name}})
+
+
+def update_companies_new(request):
+    fake = Faker()
+
+    company_names = []
+    with open('companies.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            company_names.append(row['Company'])
+
+    old_company_name = random.choice(company_names)
+
+    client = MongoClient('mongodb://mongo:27017/')
+    db = client['eksperiment']
+    person_collection = db['Person']
+
+    persons_to_update = person_collection.find({'companies': old_company_name})
+
+    while True:
+        new_company_name = fake.company()
+        if new_company_name not in company_names:
+            break
+
+    for person in persons_to_update:
+        updated_companies = [new_company_name if company == old_company_name else company for company in person['companies']]
+        person_collection.update_one(
+            {'_id': person['_id']},
+            {'$set': {'companies': updated_companies}}
+        )
