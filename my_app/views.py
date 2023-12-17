@@ -205,7 +205,7 @@ def update_companies(request):
     fake = Faker()
 
     company_names = []
-    with open('companies.csv', newline='') as csvfile:
+    with open('company_data.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             company_names.append(row['Company'])
@@ -214,12 +214,16 @@ def update_companies(request):
 
     person_collection = get_Collection('Person')
 
-    persons_to_update = person_collection.find({'companies': old_company_name})
+    persons_to_update = list(person_collection.find({'companies': old_company_name}))
 
-    while True:
+    new_company_name = fake.company()
+    while new_company_name in company_names:
+        new_company_name = fake.company()
+
+    """while True:
         new_company_name = fake.company()
         if new_company_name not in company_names:
-            break
+            break"""
 
     for person in persons_to_update:
         updated_companies = [new_company_name if company == old_company_name else company for company in person['companies']]
@@ -228,12 +232,14 @@ def update_companies(request):
             {'$set': {'companies': updated_companies}}
         )
 
+    return JsonResponse({"message": "Updated"})
+
 def update_companies_2(request):
     fake = Faker()
 
     company_names = []
-    with open('companies.csv', newline='') as csvfile:
-        reader = csv.reader(csvfile)
+    with open('company_data.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
         for row in reader:
             company_names.append(row['Company'])
 
@@ -247,4 +253,6 @@ def update_companies_2(request):
     company_collection = get_Collection('Company')
 
     company_collection.update_one({'name': old_company_name}, {'$set': {'name': new_company_name}})
+
+    return JsonResponse({"message": "Updated"})
 
