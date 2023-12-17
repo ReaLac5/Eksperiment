@@ -11,7 +11,7 @@ def generate_company_dict(count):
             unique_companies[company_name] = fake.address()
     return unique_companies
 
-company_dict = generate_company_dict(20000)
+company_dict = generate_company_dict(13000)
 
 with open('company_data_2.csv', 'w', newline='') as csvfile:
     fieldnames = ['Company', 'Address']

@@ -28,9 +28,23 @@ def get_all_person_2(request):
     persons = person_collection.find()
     return HttpResponse(persons)
 
+def get_all_person_3(request):
+    person_collection = get_Collection('Person-3')
+    persons = person_collection.find()
+    return HttpResponse(persons)
+
+def get_all_person_4(request):
+    person_collection = get_Collection('Person-4')
+    persons = person_collection.find()
+    return HttpResponse(persons)
 
 def get_all_company(request):
     company_collection = get_Collection('Company')
+    companies = company_collection.find()
+    return HttpResponse(companies)
+
+def get_all_company_2(request):
+    company_collection = get_Collection('Company-2')
     companies = company_collection.find()
     return HttpResponse(companies)
 

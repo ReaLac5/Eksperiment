@@ -8,7 +8,6 @@ db = client['eksperiment']
 collection = db['Person']
 collection_person_2 = db['Person-2']
 collection_company = db['Company']
-
 collection_person_3 = db['Person-3']
 collection_person_4 = db['Person-4']
 collection_company_2 = db['Company-2']
@@ -101,7 +100,7 @@ with open('names_10000.csv', 'r') as file:
                 company_names.add(company_name)
         
         for company_name in company_names:
-            company_data = collection_company.find_one({'name': company_name})
+            company_data = collection_company_2.find_one({'name': company_name})
             if company_data:
                 company_ids[company_name] = company_data['_id']
 
