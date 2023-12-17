@@ -2,8 +2,7 @@ import pymongo
 import csv
 from bson import ObjectId
 
-url = 'mongodb://mongo:27017/'
-client = pymongo.MongoClient(url)
+client = pymongo.MongoClient('mongodb://mongo:27017/')
 db = client['eksperiment']
 collection = db['Person']
 collection_person_2 = db['Person-2']
@@ -25,7 +24,7 @@ with open('output_data_Person.csv', 'r') as file:
 
         collection.insert_one(data)
 
-print("Data inserted into MongoDB")
+print("Data inserted into MongoDB - Person")
 
 with open('output_data_Person_2.csv', 'r') as file:
     reader = csv.DictReader(file)
@@ -46,7 +45,7 @@ with open('output_data_Person_2.csv', 'r') as file:
 
         collection_person_2.insert_one(data)
 
-print("Data inserted into MongoDB")
+print("Data inserted into MongoDB - Person-2")
 
 with open('output_data_Company.csv', 'r') as file:
     reader = csv.DictReader(file)
@@ -60,4 +59,4 @@ with open('output_data_Company.csv', 'r') as file:
 
         collection_company.insert_one(data)
 
-print("Data inserted into MongoDB")
+print("Data inserted into MongoDB - Company")

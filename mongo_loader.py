@@ -3,8 +3,7 @@ import csv
 from faker import Faker
 import random
 
-url = 'mongodb://mongo:27017/'
-client = pymongo.MongoClient(url)
+client = pymongo.MongoClient('mongodb://mongo:27017/')
 db = client['eksperiment']
 collection = db['Person']
 collection_person_2 = db['Person-2']
