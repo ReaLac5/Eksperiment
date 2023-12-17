@@ -7,56 +7,74 @@ db = client['eksperiment']
 collection = db['Person']
 collection_person_2 = db['Person-2']
 collection_company = db['Company']
+collection_person_3 = db['Person-3']
+collection_person_4 = db['Person-4']
+collection_company_2 = db['Company-2']
 
-with open('output_data_Person.csv', 'r') as file:
-    reader = csv.DictReader(file)
+def insert_person(collection, filename):
+    with open(filename, 'r') as file:
+        reader = csv.DictReader(file)
 
-    for row in reader:
-        companies_str = row['companies']
-        companies_list = eval(companies_str)
+            
+        for row in reader:
+            companies_str = row['companies']
+            companies_list = eval(companies_str)
 
-        data = {
-            '_id': ObjectId(row['_id']),
-            'first_name': row['first_name'],
-            'last_name': row['last_name'],
-            'companies': companies_list
-        }
+            data = {
+                '_id': ObjectId(row['_id']),
+                'first_name': row['first_name'],
+                'last_name': row['last_name'],
+                'companies': companies_list
+            }
 
-        collection.insert_one(data)
+            collection.insert_one(data)
 
+def insert_person_2(collection, filename):
+    with open(filename, 'r') as file:
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            companies_str = row['companies']
+            companies_list = eval(companies_str)
+
+            companies_list = [ObjectId(company) for company in companies_list]
+
+            data = {
+                '_id': ObjectId(row['_id']),
+                'first_name': row['first_name'],
+                'last_name': row['last_name'],
+                'companies': companies_list
+            }
+
+            collection.insert_one(data)
+
+insert_person(collection, 'output_data_Person.csv')
 print("Data inserted into MongoDB - Person")
 
-with open('output_data_Person_2.csv', 'r') as file:
-    reader = csv.DictReader(file)
-    
-    for row in reader:
-        companies_str = row['companies']
+insert_person_2(collection_person_2, 'output_data_Person_2.csv')
+print("Data inserted into MongoDB - Person - 2")
 
-        companies_list_str = eval(companies_str)
-        #companies_list = [ObjectId(company.strip().replace("ObjectId('", '').replace("')", '')) for company in companies_list_str]
-        companies_list = [ObjectId(company) for company in companies_list_str]
+insert_person(collection_person_3, 'output_data_Person_3.csv')
+print("Data inserted into MongoDB - Person - 3")
 
-        data = {
-            '_id': ObjectId(row['_id']),
-            'first_name': row['first_name'],
-            'last_name': row['last_name'],
-            'companies': companies_list
-        }
+insert_person_2(collection_person_4, 'output_data_Person_4.csv')
+print("Data inserted into MongoDB - Person - 4")
 
-        collection_person_2.insert_one(data)
+def insert_company(collection, filename):
+    with open(filename, 'r') as file:
+        reader = csv.DictReader(file)
 
-print("Data inserted into MongoDB - Person-2")
+        for row in reader:
+            data = {
+                '_id': ObjectId(row['_id']),
+                'name': row['name'],
+                'address': row['address']
+            }
 
-with open('output_data_Company.csv', 'r') as file:
-    reader = csv.DictReader(file)
+            collection.insert_one(data)
 
-    for row in reader:
-        data = {
-            '_id': ObjectId(row['_id']),
-            'name': row['name'],
-            'address': row['address']
-        }
-
-        collection_company.insert_one(data)
-
+insert_company(collection_company, 'output_data_Company.csv')
 print("Data inserted into MongoDB - Company")
+
+insert_company(collection_company_2, 'output_data_Company_2.csv')
+print("Data inserted into MongoDB - Company - 2")
