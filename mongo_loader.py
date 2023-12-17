@@ -9,6 +9,10 @@ collection = db['Person']
 collection_person_2 = db['Person-2']
 collection_company = db['Company']
 
+collection = db['Person-3']
+collection_person_2 = db['Person-4']
+collection_company = db['Company-2']
+
 fake = Faker()
 
 def generate_company_dict(count):
@@ -19,11 +23,38 @@ def generate_company_dict(count):
             unique_companies[company_name] = fake.address()
     return unique_companies
 
+def generate_name_dict(count):
+    names = {}
+    while len(names) < count:
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        full_name = f"{first_name} {last_name}"
+        if full_name not in names.values():
+            names[first_name] = last_name
+    return names
+
 min_companies = 2
 max_companies = 5
 
 company_dict = generate_company_dict(3000)
+names = generate_name_dict(10000)
+company_dict_2 = generate_company_dict(13000)
 
+with open('names_10000.csv', 'w', newline='') as csvfile:
+    fieldnames = ['first_name', 'last_name']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+    writer.writeheader()
+    for key, value in names.items():
+        writer.writerow({'first_name': key, 'last_name': value})
+
+with open('company_data_2.csv', 'w', newline='') as csvfile:
+    fieldnames = ['Company', 'Address']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+    writer.writeheader()
+    for key, value in company_dict_2.items():
+        writer.writerow({'Company': key, 'Address': value})
 
 for company_name, address in company_dict.items():
     company_data = {
@@ -32,6 +63,14 @@ for company_name, address in company_dict.items():
     }
     inserted_company = collection_company.insert_one(company_data)
 
+with open('names_10000.csv', 'w', newline='') as csvfile:
+    fieldnames = ['first_name', 'last_name']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+    writer.writeheader()
+    for key, value in names.items():
+        first_name, last_name = key.split()
+        writer.writerow({'first_name': first_name, 'last_name': last_name})
 
 with open('MOCK_DATA.csv', 'r') as file:
     reader = csv.DictReader(file)
@@ -70,6 +109,6 @@ with open('company_data.csv', 'w', newline='') as csvfile:
 
     writer.writeheader()
     for key, value in company_dict.items():
-        writer.writerow({'Company': key, 'Address': value})  # Adjust the field names based on your dictionary structure
+        writer.writerow({'Company': key, 'Address': value})
 
 print("Data inserted into MongoDB")
