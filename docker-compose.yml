@@ -15,7 +15,6 @@ services:
     depends_on:
       - mongo
     command: python3 manage.py runserver 0.0.0.0:8000
-    #entrypoint: /usr/local/bin/entrypoint.sh
 
   mongo:
     image: mongo:latest

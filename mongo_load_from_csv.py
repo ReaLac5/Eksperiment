@@ -8,7 +8,6 @@ collection = db['Person']
 collection_person_2 = db['Person-2']
 collection_company = db['Company']
 collection_person_3 = db['Person-3']
-collection_person_4 = db['Person-4']
 collection_company_2 = db['Company-2']
 
 def insert_person(collection, filename):
@@ -56,9 +55,6 @@ print("Data inserted into MongoDB - Person - 2")
 
 insert_person(collection_person_3, 'output_data_Person_3.csv')
 print("Data inserted into MongoDB - Person - 3")
-
-insert_person_2(collection_person_4, 'output_data_Person_4.csv')
-print("Data inserted into MongoDB - Person - 4")
 
 def insert_company(collection, filename):
     with open(filename, 'r') as file:

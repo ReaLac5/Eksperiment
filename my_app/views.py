@@ -33,11 +33,6 @@ def get_all_person_3(request):
     persons = person_collection.find()
     return HttpResponse(persons)
 
-def get_all_person_4(request):
-    person_collection = get_Collection('Person-4')
-    persons = person_collection.find()
-    return HttpResponse(persons)
-
 def get_all_company(request):
     company_collection = get_Collection('Company')
     companies = company_collection.find()
@@ -175,15 +170,6 @@ def get_people_by_company_name_2(request):
     people_names = [{'first_name': person['first_name'], 'last_name': person['last_name']} for person in people_with_company]
 
     return JsonResponse({'people_with_company': people_names})
-
-    """for person in people_list:
-        company_ids = person['companies']
-        company_names = []
-        for company_id in company_ids:
-            company = company_collection.find_one({'_id': ObjectId(company_id)})
-            if company and 'name' in company:
-                company_names.append(company['name'])
-        person['companies'] = company_names"""
 
 
 def add_company_to_person(request):

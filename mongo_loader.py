@@ -9,7 +9,6 @@ collection = db['Person']
 collection_person_2 = db['Person-2']
 collection_company = db['Company']
 collection_person_3 = db['Person-3']
-collection_person_4 = db['Person-4']
 collection_company_2 = db['Company-2']
 
 fake = Faker()
@@ -110,12 +109,5 @@ with open('names_10000.csv', 'r') as file:
             'companies': list(company_names)
         }
         collection_person_3.insert_one(data)
-
-        data_2 = {
-            'first_name': row['first_name'],
-            'last_name': row['last_name'],
-            'companies': [company_ids[name] for name in company_names if name in company_ids]
-        }
-        collection_person_4.insert_one(data_2)
 
 print("Data inserted into MongoDB")
