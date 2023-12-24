@@ -93,6 +93,50 @@ def get_companies_by_name_2(request):
     return JsonResponse(company_names, safe=False)
 
 
+def get_companies_by_name_3(request):
+    first_names = []
+    with open('names_10000.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            first_names.append(row['first_name'])
+ 
+    person_collection = get_Collection('Person-3')
+        
+    random_name = random.choice(first_names)
+
+    person = person_collection.find_one({"first_name": random_name})
+
+    companies = person.get("companies", [])
+    
+    company_list = [{"company_name": company} for company in companies]
+
+    return JsonResponse(company_list, safe=False)
+
+def get_companies_by_name_4(request):
+    first_names = []
+    with open('names_10000.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            first_names.append(row['first_name'])
+
+    person_collection = get_Collection('Person-4')
+    company_collection = get_Collection('Company-2')
+
+    random_name = random.choice(first_names)
+
+    person = person_collection.find_one({"first_name": random_name})
+
+    company_ids = person.get("companies", [])
+    
+    company_names = []
+    for company_id in company_ids:
+        company = company_collection.find_one({"_id": ObjectId(company_id)})
+        if company:
+            company_names.append({"company_name": company.get("name")})
+
+    return JsonResponse(company_names, safe=False)
+
+
 def get_people_by_company_name(request):
     company_dict_read = {}
     with open('company_data.csv', newline='') as csvfile:
@@ -144,6 +188,9 @@ def get_people_by_company_name_2(request):
 
 def add_company_to_person(request):
     fake = Faker()
+
+    person_collection = get_Collection('Person')
+
     with open('MOCK_DATA.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         random_row = random.choice(list(reader))
@@ -151,19 +198,14 @@ def add_company_to_person(request):
     first_name = random_row['first_name']
     last_name = random_row['last_name']
 
-    person_collection = get_Collection('Person')
-
     person = person_collection.find_one({"first_name": first_name, "last_name": last_name})
 
     if person:
-        with open('company_data.csv', newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            company_data = [row['Company'] for row in reader]
+        distinct_companies = person_collection.distinct('companies')
 
-        while True:
+        new_company_name = fake.company()
+        while new_company_name in distinct_companies:
             new_company_name = fake.company()
-            if new_company_name not in company_data:
-                break
 
         person_collection.update_one(
             {"first_name": first_name, "last_name": last_name},
@@ -176,28 +218,26 @@ def add_company_to_person(request):
 
 def add_company_to_person_2(request):
     fake = Faker()
+
+    person_collection = get_Collection('Person-2')
+    company_collection = get_Collection('Company')
+
     with open('MOCK_DATA.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         random_row = random.choice(list(reader))
 
     first_name = random_row['first_name']
-    last_name = random_row['last_name']
-
-    
-    person_collection = get_Collection('Person-2')
-    company_collection = get_Collection('Company')
+    last_name = random_row['last_name']   
 
     person = person_collection.find_one({"first_name": first_name, "last_name": last_name})
 
     if person:
-        with open('company_data.csv', newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            company_data = [row['Company'] for row in reader]
+        company_collection = get_Collection('Company')
+        distinct_company_names = company_collection.distinct('name')
 
-        while True:
+        new_company_name = fake.company()
+        while new_company_name in distinct_company_names:
             new_company_name = fake.company()
-            if new_company_name not in company_data:
-                break
 
         company = {
             'name': new_company_name,
@@ -218,26 +258,17 @@ def add_company_to_person_2(request):
 def update_companies(request):
     fake = Faker()
 
-    company_names = []
-    with open('company_data.csv', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            company_names.append(row['Company'])
+    person_collection = get_Collection('Person-3')
 
-    old_company_name = random.choice(company_names)
+    distinct_companies = person_collection.distinct('companies')
 
-    person_collection = get_Collection('Person')
+    old_company_name = random.choice(distinct_companies)
 
     persons_to_update = list(person_collection.find({'companies': old_company_name}))
 
     new_company_name = fake.company()
-    while new_company_name in company_names:
+    while new_company_name in distinct_companies:
         new_company_name = fake.company()
-
-    """while True:
-        new_company_name = fake.company()
-        if new_company_name not in company_names:
-            break"""
 
     for person in persons_to_update:
         updated_companies = [new_company_name if company == old_company_name else company for company in person['companies']]
@@ -251,22 +282,22 @@ def update_companies(request):
 def update_companies_2(request):
     fake = Faker()
 
-    company_names = []
-    with open('company_data.csv', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            company_names.append(row['Company'])
+    company_collection = get_Collection('Company-2')
 
-    old_company_name = random.choice(company_names)
+    company_cursor = company_collection.aggregate([{"$sample": {"size": 1}}])
 
-    while True:
+    company_record = next(company_cursor, None)
+
+    old_company_name = company_record['name']
+
+    new_company_name = fake.company()
+    while new_company_name == old_company_name:
         new_company_name = fake.company()
-        if new_company_name not in company_names:
-            break
+   
+    company_record = company_collection.find_one({'name': old_company_name})
 
-    company_collection = get_Collection('Company')
-
-    company_collection.update_one({'name': old_company_name}, {'$set': {'name': new_company_name}})
+    company_collection.update_one({'_id': company_record['_id']}, {'$set': {'name': new_company_name}})
 
     return JsonResponse({"message": "Updated"})
+
 
